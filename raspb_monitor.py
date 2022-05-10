@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import logging
 import sys
 import platform
@@ -8,13 +10,14 @@ import psutil
 import socket
 import uuid
 
-from uuid import getnode
 
+from uuid import getnode
+from jtop import jtop
 from logging import Logger
 from datetime import datetime
 import peewee
 
-from monitoring.data import CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine
+from monitoring.data import CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, GPU, GPUMeasurement
 from monitoring.config import DATABASE
 from monitoring.database.db_helper import setup_db
 
@@ -189,6 +192,16 @@ class DeviceMonitor(object):
         rec.memory = self.memory._pk
         rec.timestamp = timestamp
         rec.save(force_insert=True)
+
+# try jtop export properties (in case of jetson nano)
+# get temp, power, gpu
+    def generate_gpu_record(self, data:dict, timestamp=datetime.now()) -> None:
+        assert type(data) == dict
+
+        #try:
+        #    rec = GPUMeasurement(**data)
+
+
 
 
 #############################################################

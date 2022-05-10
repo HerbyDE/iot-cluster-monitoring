@@ -1,6 +1,14 @@
 # this python file is for connecting to our edge_monitoring database
 import psycopg2
-from peewee import PostgresqlDatabase
+from peewee import *
+
+database = PostgresqlDatabase(database="edge_monitoring", user="monitoring", password="monitoring",
+                              host="131.159.52.50", autorollback=True)
+
+
+class BaseModel(Model):
+    class Meta:
+        database = database
 
 
 def start_db(models: list, database: PostgresqlDatabase) -> None:
@@ -12,9 +20,6 @@ def teardown_db(models, database: PostgresqlDatabase):
     database.connect()
     database.drop_tables(models)
 
-
 # cur.execute("""SELECT * FROM devices""")
 # query_results = cur.fetchall()
 # print(query_results)
-
-
