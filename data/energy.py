@@ -1,7 +1,7 @@
 from peewee import Model, TextField, CharField, IntegerField, FloatField, DateTimeField, IPField, ForeignKeyField
 
 from datetime import datetime
-from monitoring.config import DATABASE
+from config import DATABASE
 
 
 class EnergyMonitor(Model):

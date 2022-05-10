@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import logging
 import sys
 import platform
@@ -10,16 +9,19 @@ import psutil
 import socket
 import uuid
 
+try:
+    from jtop import jtop
+except:
+    pass
 
 from uuid import getnode
-from jtop import jtop
 from logging import Logger
 from datetime import datetime
 import peewee
 
-from monitoring.data import CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, GPU, GPUMeasurement
-from monitoring.config import DATABASE
-from monitoring.database.db_helper import setup_db
+from data import CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, GPU, GPUMeasurement, Temperature
+from config import DATABASE
+from database.database_helper import start_db
 
 file_dir = os.path.abspath(__file__)
 par_dir = os.path.abspath(os.path.join(file_dir, os.pardir))
@@ -39,13 +41,20 @@ class DeviceMonitor(object):
 
         self.start_time = datetime.now()
 
+        try:
+            self.jetson = jtop()
+            self.jetson.start()
+            self.is_jetson = True
+        except:
+            self.is_jetson = False
+
         # The device monitor instantiates a local database to store metrics. Once monitoring is done, the data will be
         # sent to a MQTT broker.
         # TODO: Create Ansible script to introduce monitoring service and and configure PostgreSQL db
         self.database = DATABASE
 
     def setup(self) -> None:
-        setup_db([CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine], database=self.database)
+        start_db([CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, GPU, GPUMeasurement], database=self.database)
         self.mac_address = hex(uuid.getnode())[2:]
 
         # Setup the machine model in database
@@ -80,6 +89,15 @@ class DeviceMonitor(object):
         }
         self.memory, created_mem = Memory.get_or_create(machine=self.mac_address, defaults=memory_data)
 
+        # Setup the gpu model in database (make sure to keep gpu primary key available)
+        gpu_data = {
+            "name": platform.machine(),
+            "machine": self.mac_address,
+            "min_freq": jtop.gpu,
+            "max_freq": jtop.gpu
+        }
+        self.gpu, created_gpu = GPU.get_or_create(machine=self.mac_address, defaults=gpu_data)
+
     def collect_metrics(self, mps=1, start_time=None, end_after=None) -> None:
         """
         Collects all device metrics from CPU, Memory, and Swap.
@@ -101,11 +119,13 @@ class DeviceMonitor(object):
             timestamp = datetime.now()
             cpu = self.get_cpu_measurement()
             memory = self.get_memory_and_swap_measurement()
+            gpu = self.get_gpu_measurement()
 
             self.generate_cpu_record(data=cpu, timestamp=timestamp)
             self.generate_memory_record(data=memory, timestamp=timestamp)
+            self.generate_gpu_record(data=gpu, timestamp=timestamp)
 
-            time.sleep(1/mps)
+            time.sleep(1 / mps)
             loop += 1
 
             if end_after:
@@ -164,6 +184,18 @@ class DeviceMonitor(object):
 
         return data
 
+    # Jetson Nano device statistics
+
+    def get_gpu_measurement(self):
+        """
+        Obtains gpu values from a jetson nano device.
+        :return: list
+        """
+        if self.is_jetson:
+            return self.jetson.gpu['frq'], self.jetson.gpu['val']
+        else:
+            return None, None
+
     def generate_cpu_record(self, data: dict, timestamp=datetime.now()) -> None:
         """
         Takes a dict writes it off to a database
@@ -193,15 +225,13 @@ class DeviceMonitor(object):
         rec.timestamp = timestamp
         rec.save(force_insert=True)
 
-# try jtop export properties (in case of jetson nano)
-# get temp, power, gpu
-    def generate_gpu_record(self, data:dict, timestamp=datetime.now()) -> None:
-        assert type(data) == dict
+    def generate_gpu_record(self, data: dict, timestamp=datetime.now()) -> None:
+        rec = GPUMeasurement(**data)
+        rec.gpu = self.gpu._pk
+        rec.timestamp = timestamp
+        rec.save(force_insert=True)
 
-        #try:
-        #    rec = GPUMeasurement(**data)
-
-
+    # TODO: add temperature of cpu and gpu measurement and record
 
 
 #############################################################
@@ -211,5 +241,3 @@ if __name__ == "__main__":
     monitor = DeviceMonitor()
     monitor.setup()
     monitor.collect_metrics(mps=1)
-
-

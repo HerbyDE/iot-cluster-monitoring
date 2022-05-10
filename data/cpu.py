@@ -1,9 +1,9 @@
 from peewee import Model, TextField, CharField, IntegerField, DateTimeField, ForeignKeyField, PrimaryKeyField
 
-from .machine import Machine
+from machine import Machine
 from datetime import datetime
 
-from monitoring.config import DATABASE
+from config import DATABASE
 
 
 class CPU(Model):

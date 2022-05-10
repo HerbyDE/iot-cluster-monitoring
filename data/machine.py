@@ -1,6 +1,6 @@
 from peewee import Model, TextField, CharField, IntegerField, FloatField, DateTimeField, IPField, BooleanField
 from datetime import datetime
-from monitoring.config import DATABASE
+from config import DATABASE
 
 
 class Machine(Model):

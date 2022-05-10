@@ -1,8 +1,8 @@
 from peewee import Model, TextField, DateTimeField, ForeignKeyField, BigIntegerField, FloatField
 
-from .machine import Machine
+from machine import Machine
 from datetime import datetime
-from monitoring.config import DATABASE
+from config import DATABASE
 
 
 class Memory(Model):
