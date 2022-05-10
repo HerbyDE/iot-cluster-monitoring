@@ -201,7 +201,7 @@ class DeviceMonitor(object):
             # Get temperatures in Celsius
             temp = psutil.sensors_temperatures(False)
             data = dict()
-            data["machine"] = temp["sensor"] # TODO get index right
+            data["machine"] = temp["sensor"]  # TODO get index right
             data["label"] = temp["sensor"][0].label
             data["current"] = temp["sensor"][0].current
             data["high"] = temp["sensor"][0].high
@@ -259,7 +259,6 @@ class DeviceMonitor(object):
         rec.temp = self.temperature._pk
         rec.timestamp = timestamp
         rec.save(force_insert=True)
-
 
 
 #############################################################
