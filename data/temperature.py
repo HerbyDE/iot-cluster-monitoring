@@ -4,19 +4,20 @@ from datetime import datetime
 from config import DATABASE
 
 
-class Temperature:
+class Temperature(Model):
     machine = ForeignKeyField(model=Machine, verbose_name="Assoc. Machine", primary_key=True)
+    label = TextField(verbose_name="Label of the sensor")
+    high = DoubleField(verbose_name="Highest temperature")
+    critical = DoubleField(verbose_name="Critical temperature")
 
     class Meta:
         database = DATABASE
 
 
-class TemperatureMeasurement:
+class TemperatureMeasurement(Model):
+    temp = ForeignKeyField(model=Temperature, verbose_name="Assoc. Temperature")
     timestamp = DateTimeField(verbose_name="Measurement timestamp", default=datetime.now)
     current = DoubleField(verbose_name="Current temperature")
-    high = DoubleField(verbose_name="Highest temperature")
-    critical = DoubleField(verbose_name="Critical temperature")
-    label = TextField(verbose_name="Label of the sensor")
 
     class Meta:
         database = DATABASE

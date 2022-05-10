@@ -1,25 +1,23 @@
 #!/usr/bin/env python
 import logging
-import sys
-import platform
 import os
-import time
-import subprocess
-import psutil
+import platform
 import socket
+import time
 import uuid
+
+import psutil
 
 try:
     from jtop import jtop
 except:
     pass
 
-from uuid import getnode
 from logging import Logger
 from datetime import datetime
-import peewee
 
-from data import CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, GPU, GPUMeasurement, Temperature
+from data import CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, \
+    GPU, GPUMeasurement, Temperature, TemperatureMeasurement
 from config import DATABASE
 from database.database_helper import start_db
 
@@ -54,7 +52,8 @@ class DeviceMonitor(object):
         self.database = DATABASE
 
     def setup(self) -> None:
-        start_db([CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, GPU, GPUMeasurement], database=self.database)
+        start_db([CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, GPU, GPUMeasurement,
+                  Temperature, TemperatureMeasurement], database=self.database)
         self.mac_address = hex(uuid.getnode())[2:]
 
         # Setup the machine model in database
@@ -98,6 +97,15 @@ class DeviceMonitor(object):
         }
         self.gpu, created_gpu = GPU.get_or_create(machine=self.mac_address, defaults=gpu_data)
 
+        # Setup the temperature model in database (make sure to keep temperature primary key available)
+        temp_data = {
+            "machine": self.mac_address,
+            "label": psutil.sensors_temperatures(False)["sensors"][0].label,
+            "high": psutil.sensors_temperatures(False)["sensors"][0].high,
+            "critical": psutil.sensors_temperatures(False)["sensors"][0].critical
+        }
+        self.temperature, created_temp = Temperature.get_or_create(machine=self.mac_address, defaults=temp_data)
+
     def collect_metrics(self, mps=1, start_time=None, end_after=None) -> None:
         """
         Collects all device metrics from CPU, Memory, and Swap.
@@ -120,10 +128,12 @@ class DeviceMonitor(object):
             cpu = self.get_cpu_measurement()
             memory = self.get_memory_and_swap_measurement()
             gpu = self.get_gpu_measurement()
+            temp = self.get_temp_measurement()
 
             self.generate_cpu_record(data=cpu, timestamp=timestamp)
             self.generate_memory_record(data=memory, timestamp=timestamp)
             self.generate_gpu_record(data=gpu, timestamp=timestamp)
+            self.generate_temp_record(data=temp, timestamp=timestamp)
 
             time.sleep(1 / mps)
             loop += 1
@@ -184,7 +194,20 @@ class DeviceMonitor(object):
 
         return data
 
-    # Jetson Nano device statistics
+    def get_temp_measurement(self):
+        if self.is_jetson:
+            return self.jetson.temperature
+        else:
+            # Get temperatures in Celsius
+            temp = psutil.sensors_temperatures(False)
+            data = dict()
+            data["machine"] = temp["sensor"] # TODO get index right
+            data["label"] = temp["sensor"][0].label
+            data["current"] = temp["sensor"][0].current
+            data["high"] = temp["sensor"][0].high
+            data["critical"] = temp["sensor"][0].critical
+
+            return data
 
     def get_gpu_measurement(self):
         """
@@ -231,7 +254,12 @@ class DeviceMonitor(object):
         rec.timestamp = timestamp
         rec.save(force_insert=True)
 
-    # TODO: add temperature of cpu and gpu measurement and record
+    def generate_temp_record(self, data: dict, timestamp=datetime.now()) -> None:
+        rec = TemperatureMeasurement(**data)
+        rec.temp = self.temperature._pk
+        rec.timestamp = timestamp
+        rec.save(force_insert=True)
+
 
 
 #############################################################
