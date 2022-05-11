@@ -15,8 +15,9 @@ except:
 from logging import Logger
 from datetime import datetime
 
-from data import CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, \
-    GPU, GPUMeasurement, Temperature, TemperatureMeasurement
+# from data import CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, \
+#    GPU, GPUMeasurement, Temperature, TemperatureMeasurement
+from data import *
 from config import DATABASE
 from database.database_helper import start_db
 
