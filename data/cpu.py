@@ -1,6 +1,6 @@
 from peewee import Model, TextField, CharField, IntegerField, DateTimeField, ForeignKeyField, PrimaryKeyField
 
-from machine import Machine
+from .machine import Machine
 from datetime import datetime
 
 from config import DATABASE

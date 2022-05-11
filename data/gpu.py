@@ -1,5 +1,5 @@
 from peewee import Model, TextField, CharField, IntegerField, DateTimeField, ForeignKeyField
-from machine import Machine
+from .machine import Machine
 from datetime import datetime
 from config import DATABASE
 
