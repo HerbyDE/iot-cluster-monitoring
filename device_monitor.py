@@ -29,7 +29,7 @@ log_dir = os.path.join(os.path.abspath(os.path.join(os.path.join(par_dir, os.par
 class DeviceMonitor(object):
     """
     This device monitor stores all essential metrics in a PostgreSQL database. Included components: CPU, Memory
-    TODO: Include temperature & disk features.
+    TODO: Include disk features.
     """
 
     def __init__(self):
