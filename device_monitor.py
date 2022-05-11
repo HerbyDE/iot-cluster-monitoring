@@ -5,7 +5,6 @@ import platform
 import socket
 import time
 import uuid
-
 import psutil
 
 try:
