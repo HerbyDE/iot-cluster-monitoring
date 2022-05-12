@@ -1,9 +1,10 @@
 # this python file is for connecting to our edge_monitoring database
 import psycopg2
 from peewee import *
+from playhouse.db_url import connect
 
 database = PostgresqlDatabase(database="edge_monitoring", user="monitoring", password="monitoring",
-                              host="131.159.52.50", autorollback=True)
+                              host="https://monitoring.msrg.in.tum.de", autorollback=True)
 
 
 class BaseModel(Model):
@@ -13,6 +14,7 @@ class BaseModel(Model):
 
 def start_db(models: list, database: PostgresqlDatabase) -> None:
     database.connect()
+    print("reached start_db")
     database.create_tables(models, safe=True)
 
 
