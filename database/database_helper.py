@@ -4,7 +4,7 @@ from peewee import *
 from playhouse.db_url import connect
 
 database = PostgresqlDatabase(database="edge_monitoring", user="monitoring", password="monitoring",
-                              host="https://monitoring.msrg.in.tum.de", autorollback=True)
+                              host="172.24.18.12", autorollback=True)
 
 
 class BaseModel(Model):
