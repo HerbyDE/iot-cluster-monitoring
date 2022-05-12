@@ -14,7 +14,6 @@ class BaseModel(Model):
 
 def start_db(models: list, database: PostgresqlDatabase) -> None:
     database.connect()
-    print("reached start_db")
     database.create_tables(models, safe=True)
 
 
