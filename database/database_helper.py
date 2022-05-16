@@ -5,7 +5,7 @@ from playhouse.db_url import connect
 
 # try 172.24.18.12 for jetson 3 for testing in the same subnet, 131.159.52.50 is for the Monitoring VM
 database = PostgresqlDatabase(database="edge_monitoring", user="monitoring", password="monitoring",
-                              host="172.24.18.12", autorollback=True)
+                              host="131.159.52.50", autorollback=True)
 
 
 class BaseModel(Model):
