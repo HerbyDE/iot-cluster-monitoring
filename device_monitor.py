@@ -92,8 +92,8 @@ class DeviceMonitor(object):
         gpu_data = {
             "name": platform.machine(),
             "machine": self.mac_address,
-            "min_freq": jtop.gpu.fget("min_freq"),
-            "max_freq": jtop.gpu.fget("max_freq")
+            "min_freq": getattr(jtop.gpu, "min_freq"),
+            "max_freq": getattr(jtop.gpu, "max_freq")
         }
         self.gpu, created_gpu = GPU.get_or_create(machine=self.mac_address, defaults=gpu_data)
 
