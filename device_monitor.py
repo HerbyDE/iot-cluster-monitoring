@@ -93,14 +93,21 @@ class DeviceMonitor(object):
         }
         self.memory, created_mem = Memory.get_or_create(machine=self.mac_address, defaults=memory_data)
 
-        # Setup the gpu model in database (make sure to keep gpu primary key available)
-        gpu_data = {
-            "name": platform.machine(),
-            "machine": self.mac_address,
-            "min_freq": getattr(jtop.gpu, "min_freq"),
-            "max_freq": getattr(jtop.gpu, "max_freq")
-        }
-        self.gpu, created_gpu = GPU.get_or_create(machine=self.mac_address, defaults=gpu_data)
+        try:
+            with jtop() as jetson:
+                if jetson.ok():
+                    # Setup the gpu model in database (make sure to keep gpu primary key available)
+                    gpu_data = {
+                        "name": platform.machine(),
+                        "machine": self.mac_address,
+                        "min_freq": jetson.gpu["min_freq"],
+                        "max_freq": jetson.gpu["max_freq"]
+                    }
+                    self.gpu, created_gpu = GPU.get_or_create(machine=self.mac_address, defaults=gpu_data)
+                else:
+                    self.logger.log(level=0, msg="Device has no GPU")
+        except:
+            self.logger.log(level=0, msg="Device has no GPU")
 
         # Setup the temperature model in database (make sure to keep temperature primary key available)
         temp_data = {
@@ -219,10 +226,18 @@ class DeviceMonitor(object):
         Obtains gpu values from a jetson nano device.
         :return: list
         """
-        if self.is_jetson:
-            return self.jetson.gpu['frq'], self.jetson.gpu['val']
-        else:
-            return None, None
+        try:
+            with jtop() as jetson:
+                if jetson.ok():
+                    data = {
+                        "frq": jetson.gpu['frq'],
+                        "val": jetson.gpu['val']
+                    }
+                    return data
+                else:
+                    self.logger.log(level=0, msg="Error occurred recording GPU metrics.")
+        except:
+            pass
 
     def generate_cpu_record(self, data: dict, timestamp=datetime.now()) -> None:
         """
