@@ -34,6 +34,11 @@ class DeviceMonitor(object):
 
     def __init__(self):
 
+        file_path = f"{log_dir}/device_monitor.log"
+
+        if not os.path.exists(file_path):
+            open(file_path, "w").close()
+
         logging.basicConfig(filename=f"{log_dir}/device_monitor.log", filemode="w", level=logging.DEBUG)
         self.logger = Logger(name=f"Device monitor - {datetime.now()}", level=logging.DEBUG)
 
