@@ -112,9 +112,9 @@ class DeviceMonitor(object):
         # Setup the temperature model in database (make sure to keep temperature primary key available)
         temp_data = {
             "machine": self.mac_address,
-            "label": psutil.sensors_temperatures(False)["sensors"][0].label,
-            "high": psutil.sensors_temperatures(False)["sensors"][0].high,
-            "critical": psutil.sensors_temperatures(False)["sensors"][0].critical
+            "label": psutil.sensors_temperatures(False)["thermal-fan-est"][0].label,
+            "high": psutil.sensors_temperatures(False)["thermal-fan-est"][0].high,
+            "critical": psutil.sensors_temperatures(False)["thermal-fan-est"][0].critical
         }
         self.temperature, created_temp = Temperature.get_or_create(machine=self.mac_address, defaults=temp_data)
 
