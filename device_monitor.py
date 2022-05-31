@@ -196,7 +196,7 @@ class DeviceMonitor(object):
 
         data["used"] = memory.used
         data["free"] = memory.free
-        data["wired"] = memory.wired
+        # data["wired"] = memory.wired
         data["available"] = memory.available
         data["utilization"] = memory.percent
         data["swap_used"] = swap.used
@@ -204,20 +204,20 @@ class DeviceMonitor(object):
 
         return data
 
-    def get_temp_measurement(self):
-        if self.is_jetson:
-            return self.jetson.temperature
-        else:
-            # Get temperatures in Celsius
-            temp = psutil.sensors_temperatures(False)
-            data = dict()
-            data["machine"] = temp["sensor"]  # TODO get index right
-            data["label"] = temp["sensor"][0].label
-            data["current"] = temp["sensor"][0].current
-            data["high"] = temp["sensor"][0].high
-            data["critical"] = temp["sensor"][0].critical
-
-            return data
+    # def get_temp_measurement(self):
+    #     if self.is_jetson:
+    #         return self.jetson.temperature
+    #     else:
+    #         # Get temperatures in Celsius
+    #         temp = psutil.sensors_temperatures(False)
+    #         data = dict()
+    #         data["machine"] = temp["sensor"]  # TODO get index right
+    #         data["label"] = temp["sensor"][0].label
+    #         data["current"] = temp["sensor"][0].current
+    #         data["high"] = temp["sensor"][0].high
+    #         data["critical"] = temp["sensor"][0].critical
+    #
+    #         return data
 
     def get_gpu_measurement(self):
         """
