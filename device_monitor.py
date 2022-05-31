@@ -143,7 +143,7 @@ class DeviceMonitor(object):
 
             self.generate_cpu_record(data=cpu, timestamp=timestamp)
             self.generate_memory_record(data=memory, timestamp=timestamp)
-            self.generate_gpu_record(data=gpu, timestamp=timestamp)
+            # self.generate_gpu_record(data=gpu, timestamp=timestamp)
             # self.generate_temp_record(data=temp, timestamp=timestamp)
 
             time.sleep(1 / mps)
