@@ -68,7 +68,8 @@ class DeviceMonitor(object):
             "operating_system": platform.system(),
             "timestamp": datetime.now(),
             "device_class": platform.platform(),
-            "storage": psutil.disk_usage('/').total
+            "storage": psutil.disk_usage('/').total,
+            "has_gpu": True if self.is_jetson else False
         }
         self.machine, created_mac = Machine.get_or_create(mac_addr=self.mac_address, defaults=machine_data)
 
@@ -108,12 +109,12 @@ class DeviceMonitor(object):
             self.logger.log(level=0, msg="Device has no GPU")
 
         # Setup the temperature model in database (make sure to keep temperature primary key available)
-        temp_data = {
-            "machine": self.mac_address,
-            "label": psutil.sensors_temperatures(False)["thermal-fan-est"][0].label,
-            "high": psutil.sensors_temperatures(False)["thermal-fan-est"][0].high,
-            "critical": psutil.sensors_temperatures(False)["thermal-fan-est"][0].critical
-        }
+        # temp_data = {
+        #     "machine": self.mac_address,
+        #     "label": psutil.sensors_temperatures(False)["thermal-fan-est"][0].label,
+        #     "high": psutil.sensors_temperatures(False)["thermal-fan-est"][0].high,
+        #     "critical": psutil.sensors_temperatures(False)["thermal-fan-est"][0].critical
+        # }
         # self.temperature, created_temp = Temperature.get_or_create(machine=self.mac_address, defaults=temp_data)
 
     def collect_metrics(self, mps=1, start_time=None, end_after=None) -> None:
