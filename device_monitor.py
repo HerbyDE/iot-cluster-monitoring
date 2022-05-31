@@ -267,11 +267,11 @@ class DeviceMonitor(object):
         rec.timestamp = timestamp
         rec.save(force_insert=True)
 
-    def generate_gpu_record(self, data: dict, timestamp=datetime.now()) -> None:
-        rec = GPUMeasurement(**data)
-        rec.gpu = self.gpu._pk
-        rec.timestamp = timestamp
-        rec.save(force_insert=True)
+    # def generate_gpu_record(self, data: dict, timestamp=datetime.now()) -> None:
+    #     rec = GPUMeasurement(**data)
+    #     rec.gpu = self.gpu._pk
+    #     rec.timestamp = timestamp
+    #     rec.save(force_insert=True)
 
     # def generate_temp_record(self, data: dict, timestamp=datetime.now()) -> None:
     #     rec = TemperatureMeasurement(**data)
