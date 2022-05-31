@@ -15,8 +15,7 @@ except:
 from logging import Logger
 from datetime import datetime
 
-from data import CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, GPU, GPUMeasurement, Temperature, \
-    TemperatureMeasurement
+from data import CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, GPU, GPUMeasurement
 
 from config import DATABASE
 from database.database_helper import start_db
@@ -57,8 +56,7 @@ class DeviceMonitor(object):
         self.database = DATABASE
 
     def setup(self) -> None:
-        start_db([CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, GPU, GPUMeasurement,
-                  Temperature, TemperatureMeasurement], database=self.database)
+        start_db([CPU, CPUMeasurement, Memory, MemoryMeasurement, Machine, GPU, GPUMeasurement], database=self.database)
         self.mac_address = hex(uuid.getnode())[2:]
 
         # Setup the machine model in database
@@ -116,7 +114,7 @@ class DeviceMonitor(object):
             "high": psutil.sensors_temperatures(False)["thermal-fan-est"][0].high,
             "critical": psutil.sensors_temperatures(False)["thermal-fan-est"][0].critical
         }
-        self.temperature, created_temp = Temperature.get_or_create(machine=self.mac_address, defaults=temp_data)
+        # self.temperature, created_temp = Temperature.get_or_create(machine=self.mac_address, defaults=temp_data)
 
     def collect_metrics(self, mps=1, start_time=None, end_after=None) -> None:
         """
@@ -145,7 +143,7 @@ class DeviceMonitor(object):
             self.generate_cpu_record(data=cpu, timestamp=timestamp)
             self.generate_memory_record(data=memory, timestamp=timestamp)
             self.generate_gpu_record(data=gpu, timestamp=timestamp)
-            self.generate_temp_record(data=temp, timestamp=timestamp)
+            # self.generate_temp_record(data=temp, timestamp=timestamp)
 
             time.sleep(1 / mps)
             loop += 1
@@ -274,11 +272,11 @@ class DeviceMonitor(object):
         rec.timestamp = timestamp
         rec.save(force_insert=True)
 
-    def generate_temp_record(self, data: dict, timestamp=datetime.now()) -> None:
-        rec = TemperatureMeasurement(**data)
-        rec.temp = self.temperature._pk
-        rec.timestamp = timestamp
-        rec.save(force_insert=True)
+    # def generate_temp_record(self, data: dict, timestamp=datetime.now()) -> None:
+    #     rec = TemperatureMeasurement(**data)
+    #     rec.temp = self.temperature._pk
+    #     rec.timestamp = timestamp
+    #     rec.save(force_insert=True)
 
 
 #############################################################

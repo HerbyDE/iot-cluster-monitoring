@@ -6,8 +6,8 @@ from config import DATABASE
 
 class Temperature(Model):
     machine = ForeignKeyField(model=Machine, verbose_name="Assoc. Machine", primary_key=True)
-    label = TextField(verbose_name="Label of the sensor")
-    high = DoubleField(verbose_name="Highest temperature")
+    label = TextField(verbose_name="Label of the sensor", null=True)
+    high = DoubleField(verbose_name="Highest temperature", null=True)
     critical = DoubleField(verbose_name="Critical temperature")
 
     class Meta:
