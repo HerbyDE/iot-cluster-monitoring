@@ -138,7 +138,7 @@ class DeviceMonitor(object):
             cpu = self.get_cpu_measurement()
             memory = self.get_memory_and_swap_measurement()
             gpu = self.get_gpu_measurement()
-            temp = self.get_temp_measurement()
+            # temp = self.get_temp_measurement()
 
             self.generate_cpu_record(data=cpu, timestamp=timestamp)
             self.generate_memory_record(data=memory, timestamp=timestamp)
