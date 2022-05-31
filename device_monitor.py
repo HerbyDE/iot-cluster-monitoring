@@ -22,7 +22,7 @@ from database.database_helper import start_db
 
 file_dir = os.path.abspath(__file__)
 par_dir = os.path.abspath(os.path.join(file_dir, os.pardir))
-log_dir = os.path.join(os.path.abspath(os.path.join(os.path.join(par_dir, os.pardir))), "logs", "device_logs")
+log_dir = os.path.join(par_dir, "logs", "device_logs")
 
 
 class DeviceMonitor(object):
