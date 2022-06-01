@@ -286,4 +286,4 @@ class DeviceMonitor(object):
 if __name__ == "__main__":
     monitor = DeviceMonitor()
     monitor.setup()
-    monitor.collect_metrics(mps=1)
+    monitor.collect_metrics(mps=1/10)
