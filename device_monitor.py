@@ -117,7 +117,7 @@ class DeviceMonitor(object):
         # }
         # self.temperature, created_temp = Temperature.get_or_create(machine=self.mac_address, defaults=temp_data)
 
-    def collect_metrics(self, mps=1, start_time=None, end_after=None) -> None:
+    def collect_metrics(self, mps=1/60, start_time=None, end_after=None) -> None:
         """
         Collects all device metrics from CPU, Memory, and Swap.
         If no end after is specified, the measurement will end after 24h.
