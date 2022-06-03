@@ -161,24 +161,22 @@ class DeviceMonitor(object):
 
     def get_cpu_measurement(self) -> dict:
         cpu_metrics = psutil.cpu_times_percent(percpu=True)
-        cpu_data = {
-            "user": list(),
-            "nice": list(),
-            "system": list(),
-            "idle": list(),
-            "freq": list(),
-        }
+        cpu_data = dict()
 
+        i = 0
         for cpu in cpu_metrics:
-            cpu_data["user"].append(cpu.user)
-            cpu_data["nice"].append(cpu.nice)
-            cpu_data["system"].append(cpu.system)
-            cpu_data["idle"].append(cpu.idle)
+            cpu_data[f"user_{i}"] = cpu.user
+            cpu_data[f"nice_{i}"] = cpu.nice
+            cpu_data[f"system_{i}"] = cpu.system
+            cpu_data[f"idle_{i}"] = cpu.idle
+            i += 1
 
         cpu_freqs = psutil.cpu_freq(percpu=True)
 
+        i = 0
         for cpu in cpu_freqs:
-            cpu_data["freq"].append(cpu.current)
+            cpu_data[f"freq_{i}"] = cpu.current
+            i += 1
 
         return cpu_data
 
