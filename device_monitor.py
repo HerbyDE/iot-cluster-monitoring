@@ -74,6 +74,9 @@ class DeviceMonitor(object):
         }
         self.machine, created_mac = Machine.get_or_create(mac_addr=self.mac_address, defaults=machine_data)
 
+        self.machine.ip = get_ip_address()
+        self.machine.save()
+
         # setup the cpu model in database (make sure to keep the CPU primary key available)
         cpu_data = {
             "machine": self.mac_address,
@@ -277,6 +280,12 @@ class DeviceMonitor(object):
     #     rec.temp = self.temperature._pk
     #     rec.timestamp = timestamp
     #     rec.save(force_insert=True)
+
+
+def get_ip_address():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    return s.getsockname()[0]
 
 
 #############################################################
