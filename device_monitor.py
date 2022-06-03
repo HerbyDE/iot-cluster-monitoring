@@ -46,7 +46,8 @@ class DeviceMonitor(object):
         try:
             self.jetson = jtop()
             self.jetson.start()
-            self.is_jetson = True
+            self.is_jetson = self.jetson.ok()
+            self.jetson.close()
         except:
             self.is_jetson = False
 
